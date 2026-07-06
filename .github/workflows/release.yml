@@ -4,6 +4,10 @@ on:
   push:
     tags: ["v*"]
 
+permissions:
+  contents: read
+  id-token: write # for crates.io Trusted Publishing (OIDC)
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -35,7 +39,16 @@ jobs:
           cargo clippy --all-targets --all-features -- -D warnings
           cargo test --all-features
 
+      # Preferred: mint a short-lived token via crates.io Trusted Publishing (OIDC).
+      # Configure the trusted publisher on crates.io (repo + this workflow) to enable it.
+      - name: Authenticate to crates.io (Trusted Publishing)
+        id: auth
+        uses: rust-lang/crates-io-auth-action@v1
+        continue-on-error: true
+
       - name: Publish to crates.io
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          # OIDC token when Trusted Publishing is configured; otherwise the stored
+          # CARGO_REGISTRY_TOKEN secret (which can be removed once OIDC is set up).
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish
