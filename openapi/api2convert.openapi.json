@@ -1,0 +1,3325 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API2Convert",
+    "termsOfService": "https://www.api2convert.com/terms",
+    "contact": {
+      "email": "time2talk@api2convert.com"
+    },
+    "version": "2.0.1"
+  },
+  "tags": [
+    {
+      "name": "Jobs",
+      "description": "Operation related to jobs."
+    },
+    {
+      "name": "Information",
+      "description": "Static information used in the Jobs operations."
+    },
+    {
+      "name": "Conversion",
+      "description": "Operations with the conversions made for a job."
+    },
+    {
+      "name": "Input",
+      "description": "Operations with the input files for a job."
+    },
+    {
+      "name": "Output",
+      "description": "Operations with the output files for a job."
+    },
+    {
+      "name": "Statistics",
+      "description": "Statistics infomations about API usage."
+    },
+    {
+      "name": "Presets",
+      "description": "Operations for the presets"
+    },
+    {
+      "name": "Limits",
+      "description": "Limits to apply to the job"
+    }
+  ],
+  "paths": {
+    "/jobs": {
+      "get": {
+        "summary": "List of jobs active for the current user identified by the key.",
+        "description": "It will return the list of jobs for the given user. In order to get the jobs a key or token must be provided:\n  - If the user key is provided all jobs for the current will be return.\n  - If one token is provided it will return the job assigned to that token if any.\n\nThe request is paginated with an amount of 50 elements per page in any case.\n",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter the status of the job.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Pagination for list of elements.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gets the newly created job info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Job"
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No active jobs found"
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new Job with the user key.",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Job"
+        },
+        "responses": {
+          "201": {
+            "description": "Gets the newly created job info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "The JSON body is empty.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "The request exceeded the contract limits. Payment may be required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many concurrent requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server not available.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}": {
+      "get": {
+        "summary": "Get information about a Job",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get information about a Job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifies the job identified by the id, allows to start a created job.",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Job"
+        },
+        "responses": {
+          "200": {
+            "description": "The applied patch was successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The status of the job could not be changed since it is in a invalid status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Cancels a job created that haven't been started. (Allow to cancel jobs in process.)",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The job has been deleted"
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The job can not be modified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/conversions": {
+      "get": {
+        "summary": "Get list of conversions defined for the current job.",
+        "tags": [
+          "Conversion"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a list of all available conversions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Conversion"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Adds a new conversion to the given job.",
+        "tags": [
+          "Conversion"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Conversion"
+              }
+            }
+          },
+          "description": "information for the conversion.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The created conversion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Conversion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/conversions/{conversion_id}": {
+      "get": {
+        "summary": "Get list of conversions defined for the current job.",
+        "tags": [
+          "Conversion"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversion_id",
+            "in": "path",
+            "description": "Identifier for the job conversion.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a conversion for the current job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Conversion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes the conversion for a job.",
+        "tags": [
+          "Conversion"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversion_id",
+            "in": "path",
+            "description": "Identifier for the job conversion.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The conversion has been deleted"
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The job can not be modified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifies the conversion identified by the id",
+        "tags": [
+          "Conversion"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversion_id",
+            "in": "path",
+            "description": "Identifier for the job conversion.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchableConversion"
+              }
+            }
+          },
+          "description": "information on the conversion",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The applied patch was successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Conversion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Cannot apply the patch because the job's status does not allow that",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/input": {
+      "get": {
+        "summary": "Get list of binary source files for the conversion.hhh",
+        "description": "Description of the get for the inputs of a specific job.",
+        "tags": [
+          "Input"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Downloads the binary for the file.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InputFile"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "The number of inputs or the total inputs file size for a conversion has been exceeded and the file(s) discarded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new input for the current job.",
+        "tags": [
+          "Input"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InputFile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created conversion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputFile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "The request exceeded the contract limits. Payment may be required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifies all the inputs identified by job id.",
+        "tags": [
+          "Input"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "$ref": "#/components/schemas/InputFilePatch"
+              }
+            }
+          },
+          "description": "Content of the input to patch.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The inputs were successfully patched.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InputFile"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The inputs can not be patched.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/input/{file_id}": {
+      "get": {
+        "summary": "Get info on a specific job input",
+        "tags": [
+          "Input"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "Id of the file to download",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a file for the current job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputFile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes the input for a job.",
+        "tags": [
+          "Input"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "Id of the file to download",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The input file has been deleted"
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The job can not be modified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifies the input identified by the id. Only the decrypt_password credentials can be modified.",
+        "tags": [
+          "Input"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "Id of the file to download",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchableCredentials"
+              }
+            }
+          },
+          "description": "The new input credentials. Only the decrypt_password credentials can be modified.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The input was successfully patched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InputFile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The input can not be patched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/output": {
+      "get": {
+        "summary": "Get list of converted.",
+        "tags": [
+          "Output"
+        ],
+        "parameters": [
+          {
+            "name": "conversion_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "input_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Downloads the binary for the file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OutputFile"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifies all the outputs identified by job id.",
+        "tags": [
+          "Output"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/OutputFilePatch"
+        },
+        "responses": {
+          "200": {
+            "description": "The outputs were successfully patched.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OutputFile"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The outputs can not be patched.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/output/{file_id}": {
+      "get": {
+        "summary": "Get information about an output file source.",
+        "tags": [
+          "Output"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "Id of the file to download",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Gets the information for the file.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputFile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a file from the output.",
+        "tags": [
+          "Output"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "Id of the file to download",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The output file has been deleted"
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifies the output identified by the id.",
+        "tags": [
+          "Output"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "Id of the file to download",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/OutputFilePatch"
+        },
+        "responses": {
+          "200": {
+            "description": "The output was successfully patched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputFile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The output can not be patched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/threads": {
+      "get": {
+        "summary": "Get list of threads defined for the current job.",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a list of all threads currently being processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Thread"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job_id}/history": {
+      "get": {
+        "summary": "Get the change history for the current job.",
+        "tags": [
+          "Jobs"
+        ],
+        "parameters": [
+          {
+            "name": "X-Oc-Token",
+            "in": "header",
+            "description": "Token for authentication for the current job",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Oc-Api-Key",
+            "description": "Api key for the user to filter.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "path",
+            "description": "ID of job that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a list of all events for the current job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/History"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No API key or invalid API key given.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified job does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statuses": {
+      "get": {
+        "summary": "Get a list of the valid statuses.",
+        "description": "The endpoint provide a list of all available status that the Job may have during the process as a description of the status.",
+        "tags": [
+          "Information"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of statuses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Status"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conversions": {
+      "get": {
+        "summary": "Get a list of the valid conversions.",
+        "description": "Gets a list of the valid conversions that can be made with the API. For each conversion is also shown the available options for that specific type of conversion.\n\nThis conversions can be added to a Job through the specific endpoint or in the information given to create the new Job.\n",
+        "tags": [
+          "Information"
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Category for the conversion.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "description": "Target for for the conversion.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Pagination for list of elements.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of conversions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversionList"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contracts": {
+      "get": {
+        "summary": "Get information on active contracts",
+        "description": "The endpoint provides information about the active contracts",
+        "tags": [
+          "Contracts"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-oc-api-key",
+            "description": "Api key for the user to filter.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns information on active contracts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Empty answer if there are no active contracts"
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/presets": {
+      "get": {
+        "summary": "Get a list of available presets",
+        "description": "Get a list of all presets available for the current API Key (public and private)",
+        "tags": [
+          "Presets"
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Category for the conversion.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "target",
+            "in": "query",
+            "description": "Target for for the conversion.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "description": "Comma separated list of phrases to search for in the preset name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of conversions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PresetList"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new preset.",
+        "tags": [
+          "Presets"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preset"
+              }
+            }
+          },
+          "description": "information for the preset.",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The created preset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/presets/{preset_id}": {
+      "get": {
+        "summary": "Get info on a specific preset, only works for personal presets",
+        "tags": [
+          "Presets"
+        ],
+        "parameters": [
+          {
+            "name": "preset_id",
+            "in": "path",
+            "description": "ID of preset that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get the preset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresetList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified preset does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifies the preset identified by the id.",
+        "tags": [
+          "Presets"
+        ],
+        "parameters": [
+          {
+            "name": "preset_id",
+            "in": "path",
+            "description": "ID of preset that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresetPatch"
+              }
+            }
+          },
+          "description": "Content of the preset.",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The updated preset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preset"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specified preset does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Removes the given preset.",
+        "tags": [
+          "Presets"
+        ],
+        "parameters": [
+          {
+            "name": "preset_id",
+            "in": "path",
+            "description": "ID of preset that needs to be fetched",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The preset has been deleted"
+          },
+          "404": {
+            "description": "The specified preset does not exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/day/{day}/{filter}": {
+      "get": {
+        "summary": "Get the statistics data for a specific day",
+        "description": "The endpoint provides the statistics data for a specific day",
+        "tags": [
+          "Statistics"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-oc-api-key",
+            "description": "Api key for the user to filter.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "day",
+            "in": "path",
+            "description": "It must be in the format yyyy-mm-dd",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "path",
+            "description": "Allows to filter the statistics data for all or a single API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "single",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns statistics data for the requested day",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/month/{month}/{filter}": {
+      "get": {
+        "summary": "Get the statistics data for a specific month",
+        "description": "The endpoint provides the statistics data for a specific month",
+        "tags": [
+          "Statistics"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-oc-api-key",
+            "description": "Api key for the user to filter.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "month",
+            "in": "path",
+            "description": "It must be in the format yyyy-mm",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "path",
+            "description": "Allows to filter the statistics data for all or a single API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "single",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns statistics data for the requested month",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats/year/{year}/{filter}": {
+      "get": {
+        "summary": "Get the statistics data for a specific year",
+        "description": "The endpoint provides the statistics data for a specific year",
+        "tags": [
+          "Statistics"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-oc-api-key",
+            "description": "Api key for the user to filter.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "description": "It must be in the format yyyy",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filter",
+            "in": "path",
+            "description": "Allows to filter the statistics data for all or a single API key",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "single",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns statistics data for the requested year",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.api2convert.com/v2",
+      "description": "API2Convert"
+    }
+  ],
+  "components": {
+    "requestBodies": {
+      "Job": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Job"
+            }
+          }
+        },
+        "description": "Content of the job.",
+        "required": true
+      },
+      "OutputFilePatch": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/OutputFilePatch"
+            }
+          }
+        },
+        "description": "Content of the output to patch.",
+        "required": true
+      }
+    },
+    "schemas": {
+      "Job": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Unique identifier for the job."
+          },
+          "token": {
+            "type": "string",
+            "example": "12srxin63mgp23f8mtny2rgtgl1nl39i",
+            "description": "Token to identify client allowed to run the job."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "job"
+            ],
+            "default": "job",
+            "description": "Type of the job created."
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status",
+            "description": "Current status for the job"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserError"
+            },
+            "description": "Errors that happens in downloads or conversions"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserWarning"
+            },
+            "description": "Warnings that happens in downloads or conversions"
+          },
+          "process": {
+            "type": "boolean",
+            "default": true,
+            "description": "Determine if the job must be processed as soon as it is ready."
+          },
+          "fail_on_input_error": {
+            "type": "boolean",
+            "default": true,
+            "description": "Determine if the job should fail or not in case of at least one input cannot be downloaded"
+          },
+          "fail_on_conversion_error": {
+            "type": "boolean",
+            "default": true,
+            "description": "Determine if the job should fail or not in case of at least one conversion fails"
+          },
+          "conversion": {
+            "description": "Type of conversion or conversions to be carried out.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Conversion"
+            }
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Limits",
+            "description": "Limits to apply to the job"
+          },
+          "input": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InputFile"
+            },
+            "description": "Source or sources of the files to be converted."
+          },
+          "output": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OutputFile"
+            },
+            "description": "Output or Outputs of the conversion."
+          },
+          "callback": {
+            "type": "string",
+            "description": "Callback url to the the status updates",
+            "example": "http://www.mysite.com/callback"
+          },
+          "notify_status": {
+            "type": "boolean",
+            "default": false,
+            "description": "If set to true, a callback will be sent for each job status change"
+          },
+          "server": {
+            "type": "string",
+            "description": "Server assigned for file uploads and downloads",
+            "example": "https://www2.api2convert.com/v2/dl/web7"
+          },
+          "spent": {
+            "type": "integer",
+            "description": "Credits spent to complete the job",
+            "example": 2
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was created."
+          },
+          "modified_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was last modified."
+          },
+          "download_passwords": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[ -~]{0,65000}$"
+            },
+            "description": "Array of download passwords for the job. Any password in the list grants download access to all outputs of this job. Send the full list via PATCH to add, remove, or rotate passwords."
+          }
+        },
+        "required": [
+          "type",
+          "process",
+          "fail_on_input_error",
+          "fail_on_conversion_error",
+          "notify_status"
+        ]
+      },
+      "InputFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Unique identifier for the file."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "upload",
+              "remote",
+              "output",
+              "input_id",
+              "gdrive_picker",
+              "base64",
+              "cloud"
+            ],
+            "default": "remote",
+            "description": "How the file has been generated."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "canceled",
+              "downloading",
+              "failed",
+              "ready"
+            ],
+            "example": "downloading",
+            "description": "Status code identifier."
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "example": "https://www.dropbox.com/f/sfasdfhasdjkr434fadf",
+            "description": "The source of the file to be used that can be either, an external url, an identifier for an uploaded file to the server, an identifier for another input or the cloud storage (e.g. amazons3)."
+          },
+          "engine": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "video",
+              "file",
+              "website",
+              "screenshot",
+              "screenshot_pdf",
+              "zip"
+            ],
+            "description": "The remote download engine to use. E.g., if a remote web page contains an embedded video to download, use \"video\". If you need the full HTML page, use \"website\". If you need a screenshot, use \"screenshot\"."
+          },
+          "options": {
+            "type": "object",
+            "example": {
+              "screen_width": 1280,
+              "screen_height": 1024
+            },
+            "description": "Options to modify the default downloading behaviour"
+          },
+          "filename": {
+            "type": "string",
+            "example": "image.png",
+            "description": "Filename of the file."
+          },
+          "size": {
+            "type": "integer",
+            "example": 12835187,
+            "description": "Size of the file in bytes."
+          },
+          "hash": {
+            "type": "string",
+            "example": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+            "description": "(deprecated, use checksum instead) File hash for content verification"
+          },
+          "checksum": {
+            "type": "string",
+            "example": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+            "description": "Hash for content verification"
+          },
+          "content_type": {
+            "type": "string",
+            "example": "video/mp4",
+            "description": "Content type for file conversion definition"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was created."
+          },
+          "modified_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was last modified."
+          },
+          "credentials": {
+            "type": "object",
+            "example": "{\"token\": \"2134ffa487\"}",
+            "description": "Credentials needed to download or decrypt the input file."
+          },
+          "parameters": {
+            "type": "object",
+            "example": "{\"bucket\": \"some.s3.bucket\"}",
+            "description": "Any extra parameter that is specified in the documentation, if not recognized, it will be ignored."
+          },
+          "metadata": {
+            "type": "object",
+            "example": "{\"pages\": \"59\"}",
+            "description": "Might contain useful metadata for some file formats."
+          }
+        },
+        "required": [
+          "type",
+          "source"
+        ]
+      },
+      "InputFilePatch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Unique identifier for the file."
+          },
+          "options": {
+            "type": "object",
+            "example": "{\"slide_duration\": 5.5,\"resize_handling\":\"keep_aspect_ratio\",\"position\":3}",
+            "description": "The options to patch or to add to the input file."
+          }
+        }
+      },
+      "OutputFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Unique identifier for the file."
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "conversion": {
+                "type": "string"
+              },
+              "input": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Sources for the files including the input files and conversion used."
+          },
+          "filename": {
+            "type": "string",
+            "example": "example.jpg",
+            "description": "The file name of the converted file."
+          },
+          "uri": {
+            "type": "string",
+            "example": "https://www2.api2convert.com",
+            "description": "Url for downloading the file."
+          },
+          "size": {
+            "type": "integer",
+            "example": 12835187,
+            "description": "Size of the file in bytes."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "enabled",
+              "disabled"
+            ],
+            "example": "enabled",
+            "description": "Status of the output, when disabled the file will not be able to download."
+          },
+          "content_type": {
+            "type": "string",
+            "example": "image/jpg",
+            "description": "The mime type of the output file."
+          },
+          "downloads_counter": {
+            "type": "integer",
+            "example": 2,
+            "description": "Number of times the output has been downloaded."
+          },
+          "checksum": {
+            "type": "string",
+            "example": "ABCD",
+            "description": "Checksum of the file"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was created."
+          },
+          "metadata": {
+            "type": "object",
+            "example": "{\"pages\": \"59\"}",
+            "description": "Might contain useful metadata for some file formats."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "OutputFilePatch": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "example": "my_new_filename",
+            "description": "The desired file name of the converted file WITHOUT the file extension."
+          },
+          "download_password": {
+            "type": "string",
+            "example": "my_new_download_password",
+            "description": "Sets a new download password."
+          }
+        }
+      },
+      "Conversion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Identifier for the job conversion."
+          },
+          "target": {
+            "type": "string",
+            "example": "mp3",
+            "description": "Identifier for the job conversion type."
+          },
+          "category": {
+            "type": "string",
+            "example": "audio",
+            "description": "Category for the converted file."
+          },
+          "options": {
+            "type": "object",
+            "default": [],
+            "example": {
+              "bitrate": "320kbps",
+              "stereo": true
+            },
+            "description": "Type of conversion to perform with the file."
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "clear_all": true,
+              "author": "your name"
+            },
+            "description": "Metadata to be inserted/updated/deleted"
+          },
+          "output_target": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OutputTarget"
+            }
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "ConversionList": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Identifier for the job conversion."
+          },
+          "target": {
+            "type": "string",
+            "example": "mp3",
+            "description": "Identifier for the job conversion type."
+          },
+          "category": {
+            "type": "string",
+            "example": "audio",
+            "description": "Category for the conveted file."
+          },
+          "options": {
+            "type": "object",
+            "default": [],
+            "example": {
+              "bitrate": "320kbps",
+              "stereo": true
+            },
+            "description": "Type of conversion to perform with the file."
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "Preset": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Identifier for the preset."
+          },
+          "name": {
+            "type": "string",
+            "example": "my new preset",
+            "description": "A name for the preset."
+          },
+          "target": {
+            "type": "string",
+            "example": "mp3",
+            "description": "Identifier for the preset conversion type."
+          },
+          "category": {
+            "type": "string",
+            "example": "audio",
+            "description": "Category for the preset."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "public",
+              "private"
+            ],
+            "example": "public",
+            "default": "private",
+            "description": "The scope of the preset."
+          },
+          "options": {
+            "type": "object",
+            "default": [],
+            "example": {
+              "bitrate": "320kbps",
+              "stereo": true
+            },
+            "description": "The options set in the preset. Only available for private presets."
+          }
+        },
+        "required": [
+          "target",
+          "name",
+          "options",
+          "scope"
+        ]
+      },
+      "PresetPatch": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "example": "mp3",
+            "description": "Identifier for the preset conversion type."
+          },
+          "name": {
+            "type": "string",
+            "example": "my new preset",
+            "description": "A name for the preset."
+          },
+          "options": {
+            "type": "object",
+            "default": [],
+            "example": {
+              "audio_bitrate": "320kbps",
+              "stereo": true
+            },
+            "description": "The options you want to set in the preset."
+          }
+        }
+      },
+      "PresetList": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b",
+            "description": "Identifier for the preset."
+          },
+          "name": {
+            "type": "string",
+            "example": "my first preset",
+            "description": "The name of the preset."
+          },
+          "target": {
+            "type": "string",
+            "example": "mp4",
+            "description": "The target type for the preset."
+          },
+          "category": {
+            "type": "string",
+            "example": "video",
+            "description": "The category for the preset."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "public",
+              "private"
+            ],
+            "example": "public",
+            "description": "The scope of the preset."
+          },
+          "options": {
+            "type": "object",
+            "default": [],
+            "example": {
+              "bitrate": "320kbps",
+              "stereo": true
+            },
+            "description": "The options set in the preset. Only available for private presets."
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "Limits": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "object",
+            "description": "Job related limits"
+          },
+          "input": {
+            "type": "object",
+            "description": "Inputs related limits"
+          },
+          "output": {
+            "type": "object",
+            "description": "Conversions related limits"
+          }
+        }
+      },
+      "OutputTarget": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "amazons3",
+              "googlecloud",
+              "azure",
+              "ftp",
+              "youtube",
+              "gdrive"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "uploading",
+              "completed",
+              "failed"
+            ]
+          },
+          "parameters": {
+            "type": "object"
+          },
+          "credentials": {
+            "type": "object"
+          }
+        }
+      },
+      "Thread": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string",
+            "description": "Unique identifier of the thread."
+          },
+          "status": {
+            "type": "integer",
+            "description": "Status of the thread."
+          },
+          "info": {
+            "type": "string",
+            "description": "Extra information."
+          },
+          "exec_time": {
+            "type": "integer",
+            "description": "Execution time for the thread in seconds"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was created."
+          },
+          "modified_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was last modified."
+          }
+        }
+      },
+      "History": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the event."
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the job."
+          },
+          "info": {
+            "type": "string",
+            "description": "Addtional information."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time when the job was created."
+          }
+        }
+      },
+      "Status": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "processing",
+            "description": "Status code identifier."
+          },
+          "info": {
+            "type": "string",
+            "example": "The file is being processed.",
+            "description": "Description of the status code."
+          }
+        }
+      },
+      "Error": {
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "example": 8
+          },
+          "message": {
+            "type": "string",
+            "example": "The JSON body is empty"
+          },
+          "errors": {
+            "type": "object"
+          }
+        }
+      },
+      "UserError": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "The source of the error in the Job definition. Can be one of \"input\" or \"conversion\"",
+            "example": "input"
+          },
+          "id_source": {
+            "type": "string",
+            "description": "The unique identifier of the source",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b"
+          },
+          "code": {
+            "type": "integer",
+            "description": "A machine readable error code",
+            "example": 404
+          },
+          "message": {
+            "type": "string",
+            "description": "A human readable error message",
+            "example": "The file could not be downloaded by our servers. Please verify the link you have provided."
+          },
+          "details": {
+            "type": "object",
+            "description": "Further error's details"
+          }
+        }
+      },
+      "UserWarning": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "The source of the warning in the Job definition. Can be one of \"input\" or \"conversion\"",
+            "example": "input"
+          },
+          "id_source": {
+            "type": "string",
+            "description": "The unique identifier of the source",
+            "example": "8daae6d1-26e0-11e5-b2a1-0800273b325b"
+          },
+          "code": {
+            "type": "integer",
+            "description": "A machine readable warning code",
+            "example": 404
+          },
+          "message": {
+            "type": "string",
+            "description": "A human readable warning message",
+            "example": "Impossible to write metadata inside the file"
+          },
+          "details": {
+            "type": "object",
+            "description": "Further warning's details"
+          }
+        }
+      },
+      "PatchableCredentials": {
+        "type": "object",
+        "properties": {
+          "credentials": {
+            "type": "object",
+            "example": "{\"decrypt_password\":\"my_password\"}",
+            "description": "The password needed to open the protected file"
+          },
+          "parameters": {
+            "type": "object",
+            "example": "{\"delete_after_use\":true}",
+            "description": "Additional parameters for the input file"
+          }
+        }
+      },
+      "PatchableConversion": {
+        "type": "object",
+        "properties": {
+          "options": {
+            "type": "object",
+            "default": [],
+            "example": {
+              "bitrate": "320kbps",
+              "stereo": true,
+              "description": "Type of conversion to perform with the file."
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "default": [],
+            "example": {
+              "clear_all": true,
+              "author": "your name"
+            },
+            "description": "Metadata to be inserted/updated/deleted"
+          }
+        }
+      }
+    }
+  },
+  "x-generated": {
+    "note": "Auto-generated by bin/docs-build-spec.mjs from the live Swagger 2.0 schema. Do not edit by hand — run `yarn docs:spec`.",
+    "source": "https://api.api2convert.com/v2/schema"
+  }
+}

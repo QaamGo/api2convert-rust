@@ -1,0 +1,36 @@
+[package]
+name = "api2convert"
+version = "10.2.0"
+edition = "2021"
+rust-version = "1.74"
+description = "Official Rust SDK for the API2Convert file-conversion API — one-call convert with upload, polling, download and webhook verification."
+license = "MIT"
+authors = ["Qaamgo Media GmbH"]
+repository = "https://github.com/QaamGo/api2convert-rust"
+homepage = "https://www.api2convert.com"
+documentation = "https://docs.rs/api2convert"
+readme = "README.md"
+keywords = ["api2convert", "conversion", "convert", "file", "sdk"]
+categories = ["api-bindings", "web-programming::http-client", "multimedia"]
+exclude = ["/.github", "/tests", "/examples", "/docs", "/openapi", "/Makefile"]
+
+[dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
+serde_json = "1"
+hmac = "0.12"
+sha2 = "0.10"
+
+[dev-dependencies]
+# The security suite spins up minimal loopback HTTP servers hand-rolled over
+# std::net::TcpListener. hmac/sha2 (already runtime deps) let the webhook test
+# compute a signature to verify against.
+hmac = "0.12"
+sha2 = "0.10"
+
+[[example]]
+name = "convert"
+path = "examples/convert.rs"
+
+[[example]]
+name = "webhook"
+path = "examples/webhook.rs"
