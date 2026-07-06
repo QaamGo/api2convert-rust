@@ -19,7 +19,7 @@ version together.
 api2convert = "10"
 ```
 
-Requires Rust 1.74+.
+Requires Rust 1.86+ (set by the `reqwest` dependency tree).
 
 ## Quickstart
 

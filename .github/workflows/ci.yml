@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         # Newest stable and the crate's MSRV.
-        toolchain: [stable, "1.74"]
+        toolchain: [stable, "1.86"]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master

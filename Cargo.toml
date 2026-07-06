@@ -2,7 +2,7 @@
 name = "api2convert"
 version = "10.2.0"
 edition = "2021"
-rust-version = "1.74"
+rust-version = "1.86"
 description = "Official Rust SDK for the API2Convert file-conversion API — one-call convert with upload, polling, download and webhook verification."
 license = "MIT"
 authors = ["Qaamgo Media GmbH"]
