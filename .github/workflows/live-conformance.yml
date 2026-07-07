@@ -1,0 +1,32 @@
+name: live-conformance
+
+# Runs the live conformance suite against the real API2Convert API whenever a new
+# version is tagged (or on demand). The API key is an encrypted repository secret,
+# never exposed to fork pull requests.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Live conformance
+        env:
+          API2CONVERT_API_KEY: ${{ secrets.API2CONVERT_API_KEY }}
+        run: |
+          if [ -z "$API2CONVERT_API_KEY" ]; then
+            echo "API2CONVERT_API_KEY not set; skipping live conformance."
+            exit 0
+          fi
+          cargo test --test live -- --ignored --nocapture
