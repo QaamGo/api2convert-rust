@@ -4,6 +4,12 @@ All notable changes to the API2Convert Rust SDK are documented here. This SDK ve
 the sibling SDKs (PHP, Python, Java, Node.js, Go, Ruby) against the shared
 [`SDK_CONTRACT.md`](SDK_CONTRACT.md).
 
+## 10.2.1 — 2026-07-08
+
+Lock-step version bump to keep all API2Convert SDKs on 10.2.1. No library/runtime changes since
+10.2.0 (the redirect / download-password hardening already shipped); added a runnable example per
+documented guide and expanded the live-conformance suite to seven canonical scenarios.
+
 ## 10.2.0 — Initial release
 
 Faithful, idiomatic Rust port at feature parity with the SDK family.
