@@ -1,5 +1,11 @@
 # API2Convert Rust SDK
 
+[![CI](https://github.com/QaamGo/api2convert-rust/actions/workflows/ci.yml/badge.svg)](https://github.com/QaamGo/api2convert-rust/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/api2convert)](https://crates.io/crates/api2convert)
+[![docs.rs](https://img.shields.io/docsrs/api2convert)](https://docs.rs/api2convert)
+![Rust](https://img.shields.io/badge/rust-%E2%89%A5%201.86-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 Official Rust SDK for the [API2Convert](https://www.api2convert.com) file-conversion API.
 
 One call uploads (or references a URL), starts the job, polls it to completion and hands you the
