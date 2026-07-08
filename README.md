@@ -188,6 +188,38 @@ let client = Api2Convert::builder()
 | `poll_timeout` | 300s | capped at 14400s (4h) |
 | `max_download_bytes` | 0 (unlimited) | cap downloaded size |
 
+## Examples
+
+One runnable example per documented guide lives in [`examples/`](examples/). Each
+reads the key from `API2CONVERT_API_KEY` (and honors `API2CONVERT_BASE_URL`):
+
+```sh
+API2CONVERT_API_KEY=<key> cargo run --example quickstart
+```
+
+| Example | Guide |
+|---|---|
+| [`quickstart`](examples/quickstart.rs) | Convert a remote JPG to PNG, fetch the job, download |
+| [`convert-files`](examples/convert-files.rs) | Browse the conversions catalog, then convert |
+| [`uploading-files`](examples/uploading-files.rs) | Upload a local file and convert it |
+| [`job-lifecycle`](examples/job-lifecycle.rs) | Drive create → add input → start → wait → outputs |
+| [`add-watermark`](examples/add-watermark.rs) | Stamp a PNG watermark onto a PDF |
+| [`create-thumbnails`](examples/create-thumbnails.rs) | Render a PDF page as a PNG thumbnail |
+| [`compress-files`](examples/compress-files.rs) | Compress a JPG |
+| [`create-archives`](examples/create-archives.rs) | Pack two files into a ZIP |
+| [`create-hashes`](examples/create-hashes.rs) | Compute the SHA-256 of a ZIP |
+| [`extract-assets`](examples/extract-assets.rs) | Extract embedded assets from a DOCX |
+| [`file-analysis`](examples/file-analysis.rs) | Extract a JPG's metadata as JSON |
+| [`compare-files`](examples/compare-files.rs) | SSIM-diff two images |
+| [`capture-website`](examples/capture-website.rs) | Screenshot a web page to PNG |
+| [`audio-operations`](examples/audio-operations.rs) | Transcode WAV to AAC |
+| [`image-operations`](examples/image-operations.rs) | Resize a JPG |
+| [`webhooks`](examples/webhooks.rs) | Start an async conversion with a callback |
+| [`presets`](examples/presets.rs) | List saved conversion presets |
+| [`statistics`](examples/statistics.rs) | Fetch monthly usage statistics |
+| [`rate-limits`](examples/rate-limits.rs) | Inspect the account contract / limits |
+| [`authentication`](examples/authentication.rs) | Verify the key by listing jobs |
+
 ## Testing
 
 ```sh
@@ -196,20 +228,14 @@ cargo test --test security              # redirect/leak guarantees only
 API2CONVERT_API_KEY=<key> cargo test --test live -- --ignored   # live conformance
 ```
 
-The [live conformance suite](tests/live.rs) doubles as an executable, end-to-end
-tour of the SDK — each test is a self-contained usage example:
-
-1. **Convert a remote URL** — the one-call happy path.
-2. **Upload and convert a local file** — the multipart upload path.
-3. **Convert with options** — apply target-specific conversion options.
-4. **Discover the catalog** — list conversions and option schemas.
-5. **Drive the job lifecycle by hand** — create → add input → start → wait → inspect.
-6. **Handle a validation error** — an unknown target is a typed error.
-7. **Handle an authentication error** — a bad key is typed and never leaked.
+The [live conformance suite](tests/live.rs) is the executable twin of the
+examples above: one live test per guide runs the same operation against the real
+API and asserts success, plus two negative tests (an unknown target is a typed
+validation error; a bad key is typed and never leaked).
 
 It runs automatically against the real API on every release tag (see
 `.github/workflows/live-conformance.yml`), so a published version is always
-verified end to end. Runnable single-purpose examples live in [`examples/`](examples/).
+verified end to end.
 
 ## License
 

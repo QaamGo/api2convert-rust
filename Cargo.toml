@@ -27,10 +27,83 @@ sha2 = "0.10"
 hmac = "0.12"
 sha2 = "0.10"
 
+# One runnable example per documented guide (docs.api2convert.com).
 [[example]]
-name = "convert"
-path = "examples/convert.rs"
+name = "quickstart"
+path = "examples/quickstart.rs"
 
 [[example]]
-name = "webhook"
-path = "examples/webhook.rs"
+name = "convert-files"
+path = "examples/convert-files.rs"
+
+[[example]]
+name = "uploading-files"
+path = "examples/uploading-files.rs"
+
+[[example]]
+name = "job-lifecycle"
+path = "examples/job-lifecycle.rs"
+
+[[example]]
+name = "add-watermark"
+path = "examples/add-watermark.rs"
+
+[[example]]
+name = "create-thumbnails"
+path = "examples/create-thumbnails.rs"
+
+[[example]]
+name = "compress-files"
+path = "examples/compress-files.rs"
+
+[[example]]
+name = "create-archives"
+path = "examples/create-archives.rs"
+
+[[example]]
+name = "create-hashes"
+path = "examples/create-hashes.rs"
+
+[[example]]
+name = "extract-assets"
+path = "examples/extract-assets.rs"
+
+[[example]]
+name = "file-analysis"
+path = "examples/file-analysis.rs"
+
+[[example]]
+name = "compare-files"
+path = "examples/compare-files.rs"
+
+[[example]]
+name = "capture-website"
+path = "examples/capture-website.rs"
+
+[[example]]
+name = "audio-operations"
+path = "examples/audio-operations.rs"
+
+[[example]]
+name = "image-operations"
+path = "examples/image-operations.rs"
+
+[[example]]
+name = "webhooks"
+path = "examples/webhooks.rs"
+
+[[example]]
+name = "presets"
+path = "examples/presets.rs"
+
+[[example]]
+name = "statistics"
+path = "examples/statistics.rs"
+
+[[example]]
+name = "rate-limits"
+path = "examples/rate-limits.rs"
+
+[[example]]
+name = "authentication"
+path = "examples/authentication.rs"
