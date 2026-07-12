@@ -127,6 +127,41 @@ let event = Api2Convert::webhooks().construct_event(raw_body, signature, secret)
 println!("job {} is {}", event.job.id, event.job.status.code);
 ```
 
+## Cloud storage
+
+Read an input straight from your own cloud storage (S3, Azure, FTP, Google Cloud) and/or deliver the
+result back into a bucket. Each per-provider input constructor carries that provider's keys verbatim
+— flat and lowercase, exactly as the API expects.
+
+```rust
+use api2convert::{Api2Convert, CloudInput};
+
+// Input from S3: import the source from a bucket, convert it, save the result locally.
+let client = Api2Convert::new("YOUR_API_KEY")?;
+let input = CloudInput::amazon_s3("my-bucket", "in/photo.png", "AKIA…", "…secret…");
+let result = client.convert_cloud(input, "jpg")?;
+result.save("out/", None)?;
+```
+
+Deliver the output to a bucket instead with a generic `OutputTarget` on the `output_target` control.
+When an output target is set the conversion delivers straight to your storage and produces **no**
+local file, so `convert` returns the completed job without downloading:
+
+```rust
+use api2convert::{Api2Convert, ConvertOptions, OutputTarget};
+
+let target = OutputTarget::of("amazons3")
+    .parameter("bucket", "my-bucket")
+    .parameter("file", "out/photo.jpg")
+    .credential("accesskeyid", "AKIA…")
+    .credential("secretaccesskey", "…secret…");
+client.convert_with("in.png", "jpg", ConvertOptions::new().output_target(target))?;
+```
+
+Credentials ride in the plaintext request body but are redacted everywhere the SDK could surface them
+— `Debug` output and error text mask the whole `credentials` object to `[REDACTED]` — and are never
+printed.
+
 ## Errors
 
 Every fallible call returns `Result<_, Api2ConvertError>`. Match it to react to specific conditions:
