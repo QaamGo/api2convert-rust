@@ -2,4 +2,4 @@
 
 /// The SDK version. Versioned together with the sibling API2Convert SDKs against
 /// the shared `docs/SDK_CONTRACT.md`.
-pub const VERSION: &str = "10.2.1";
+pub const VERSION: &str = "10.3.0";
