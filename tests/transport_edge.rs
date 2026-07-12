@@ -78,7 +78,7 @@ fn account_requests_carry_the_standard_headers() {
 
     client.jobs().get("job1").expect("get");
     let req = sender.last_request();
-    assert_eq!(req.header("x-oc-api-key"), Some("test-key"));
+    assert_eq!(req.header("x-api2convert-api-key"), Some("test-key"));
     assert_eq!(req.header("accept"), Some("application/json"));
     assert!(req
         .header("user-agent")

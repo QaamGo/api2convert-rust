@@ -301,11 +301,12 @@ impl ServerRequest {
             .map(|(_, v)| v.as_str())
     }
 
-    /// Whether any secret-bearing `X-Oc-*` header was received.
+    /// Whether any secret-bearing `X-Api2convert-*` (or legacy `X-Oc-*`) header was received.
     pub fn has_secret_header(&self) -> bool {
-        self.headers
-            .iter()
-            .any(|(k, _)| k.to_ascii_lowercase().starts_with("x-oc-"))
+        self.headers.iter().any(|(k, _)| {
+            let lk = k.to_ascii_lowercase();
+            lk.starts_with("x-api2convert-") || lk.starts_with("x-oc-")
+        })
     }
 }
 

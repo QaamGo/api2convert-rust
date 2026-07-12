@@ -178,7 +178,7 @@ impl Preset {
 pub struct Job {
     pub id: String,
     pub status: Status,
-    /// Per-job upload token (`X-Oc-Token`); never the account key.
+    /// Per-job upload token (`X-Api2convert-Token`); never the account key.
     pub token: Option<String>,
     /// Per-job upload server base URL.
     pub server: Option<String>,

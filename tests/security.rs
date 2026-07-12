@@ -71,9 +71,9 @@ fn upload_uses_the_token_and_does_not_follow_redirects() {
 
     let reqs = upload.requests();
     assert_eq!(reqs.len(), 1);
-    assert_eq!(reqs[0].header("x-oc-token"), Some("job-token"));
+    assert_eq!(reqs[0].header("x-api2convert-token"), Some("job-token"));
     assert!(
-        reqs[0].header("x-oc-api-key").is_none(),
+        reqs[0].header("x-api2convert-api-key").is_none(),
         "upload must not carry the account key"
     );
 }
@@ -105,7 +105,7 @@ fn download_password_is_not_forwarded_across_a_redirect() {
     let reqs = storage.requests();
     assert_eq!(reqs.len(), 1);
     assert_eq!(
-        reqs[0].header("x-oc-download-password"),
+        reqs[0].header("x-api2convert-download-password"),
         Some("dl-secret"),
         "the intended host does receive the password"
     );

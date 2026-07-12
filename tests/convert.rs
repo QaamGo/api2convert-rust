@@ -111,7 +111,7 @@ fn download_password_is_sent_on_create_and_remembered_for_download() {
     let bytes = result.contents(None).expect("download");
     assert_eq!(bytes, b"IMAGE");
     let dl = sender.last_request();
-    assert_eq!(dl.header("x-oc-download-password"), Some("s3cr3t"));
+    assert_eq!(dl.header("x-api2convert-download-password"), Some("s3cr3t"));
     assert!(
         !dl.follow_redirects,
         "a password download must not follow redirects"

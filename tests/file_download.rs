@@ -30,7 +30,7 @@ fn saves_into_a_directory_using_the_api_filename() {
     assert!(sender.last_request().follow_redirects);
     assert!(sender
         .last_request()
-        .header("x-oc-download-password")
+        .header("x-api2convert-download-password")
         .is_none());
 }
 
@@ -98,7 +98,7 @@ fn explicit_password_overrides_the_remembered_one() {
     fd.contents(Some("explicit")).expect("contents");
 
     assert_eq!(
-        sender.last_request().header("x-oc-download-password"),
+        sender.last_request().header("x-api2convert-download-password"),
         Some("explicit")
     );
 }

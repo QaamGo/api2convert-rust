@@ -43,9 +43,9 @@ fn uploads_with_the_job_token_and_never_the_account_key() {
     assert_eq!(req.method, "POST");
     assert_eq!(req.path(), "/upload-file/job1");
     assert!(req.url.starts_with("https://upload.example"));
-    assert_eq!(req.header("x-oc-token"), Some("job-token"));
+    assert_eq!(req.header("x-api2convert-token"), Some("job-token"));
     assert!(
-        req.header("x-oc-api-key").is_none(),
+        req.header("x-api2convert-api-key").is_none(),
         "the upload must not carry the account key"
     );
     let ct = req.header("content-type").unwrap();

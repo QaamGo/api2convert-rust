@@ -52,7 +52,7 @@
 //! ## Security
 //!
 //! Account key, per-job upload token and download password ride in custom
-//! `X-Oc-*` headers. Secret-bearing requests never follow redirects (only the
+//! `X-Api2convert-*` headers. Secret-bearing requests never follow redirects (only the
 //! self-contained, no-secret download path does), uploads use the per-job token
 //! (never the account key), and no secret ever appears in an error message. See
 //! `SECURITY.md`.

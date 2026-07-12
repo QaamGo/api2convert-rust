@@ -3,7 +3,7 @@
 //!
 //! The request posts `multipart/form-data` (a single `file` part) to
 //! `{server}/upload-file/{job_id}` and is authenticated with the per-job
-//! **`X-Oc-Token`** header — never the account key. The body is streamed (large
+//! **`X-Api2convert-Token`** header — never the account key. The body is streamed (large
 //! files are never buffered), and a single boundary is reused across retry
 //! attempts so `Content-Type` always matches the body.
 
@@ -119,7 +119,7 @@ pub(crate) fn upload(
         encode_segment(&job.id)
     );
     let headers = vec![
-        ("X-Oc-Token".to_string(), token.to_string()),
+        ("X-Api2convert-Token".to_string(), token.to_string()),
         ("Content-Type".to_string(), content_type),
         (
             "User-Agent".to_string(),

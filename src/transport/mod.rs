@@ -111,7 +111,7 @@ impl Transport {
         url
     }
 
-    /// A JSON account request (`X-Oc-Api-Key`). `query` values are URL-encoded;
+    /// A JSON account request (`X-Api2convert-Api-Key`). `query` values are URL-encoded;
     /// dynamic path segments must already be encoded via [`encode_segment`].
     pub(crate) fn account_request(
         &self,
@@ -122,7 +122,7 @@ impl Transport {
         idempotency_key: Option<&str>,
     ) -> Result<Value> {
         let mut headers = self.base_headers();
-        headers.push(("X-Oc-Api-Key".to_string(), self.api_key.clone()));
+        headers.push(("X-Api2convert-Api-Key".to_string(), self.api_key.clone()));
 
         let body_bytes = match &body {
             Some(v) => {
@@ -254,7 +254,7 @@ impl Transport {
             .sleep(Duration::from_secs_f64(interval.as_secs_f64() * jitter));
     }
 
-    /// Open a download stream. Any `X-Oc-*` header marks the request as
+    /// Open a download stream. Any `X-Api2convert-*` (or legacy `X-Oc-*`) header marks the request as
     /// secret-bearing, which disables redirect following; if such a request
     /// receives a redirect it is surfaced as an error (never a silent empty
     /// file, never a secret forwarded to another host).
@@ -266,12 +266,13 @@ impl Transport {
         let mut headers = vec![("User-Agent".to_string(), self.user_agent())];
         if let Some(pw) = download_password {
             if !pw.is_empty() {
-                headers.push(("X-Oc-Download-Password".to_string(), pw.to_string()));
+                headers.push(("X-Api2convert-Download-Password".to_string(), pw.to_string()));
             }
         }
-        let carries_secret = headers
-            .iter()
-            .any(|(k, _)| k.to_ascii_lowercase().starts_with("x-oc-"));
+        let carries_secret = headers.iter().any(|(k, _)| {
+            let lk = k.to_ascii_lowercase();
+            lk.starts_with("x-api2convert-") || lk.starts_with("x-oc-")
+        });
 
         let req = HttpRequest {
             method: "GET".to_string(),

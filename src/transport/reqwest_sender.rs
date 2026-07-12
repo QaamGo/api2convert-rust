@@ -4,7 +4,7 @@
 //!
 //! - `no_redirect` ([`Policy::none`]) never follows a redirect. It serves every
 //!   secret-bearing request — the account key, the per-job upload token and the
-//!   download password ride in custom `X-Oc-*` headers that an auto-following
+//!   download password ride in custom `X-Api2convert-*` headers that an auto-following
 //!   client could forward to a redirect target on another host. With this
 //!   policy a 3xx comes back verbatim, and the transport turns it into an error.
 //! - `follow` ([`Policy::limited`]) follows redirects, and serves **only** the
