@@ -266,7 +266,10 @@ impl Transport {
         let mut headers = vec![("User-Agent".to_string(), self.user_agent())];
         if let Some(pw) = download_password {
             if !pw.is_empty() {
-                headers.push(("X-Api2convert-Download-Password".to_string(), pw.to_string()));
+                headers.push((
+                    "X-Api2convert-Download-Password".to_string(),
+                    pw.to_string(),
+                ));
             }
         }
         let carries_secret = headers.iter().any(|(k, _)| {

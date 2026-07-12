@@ -98,7 +98,9 @@ fn explicit_password_overrides_the_remembered_one() {
     fd.contents(Some("explicit")).expect("contents");
 
     assert_eq!(
-        sender.last_request().header("x-api2convert-download-password"),
+        sender
+            .last_request()
+            .header("x-api2convert-download-password"),
         Some("explicit")
     );
 }
