@@ -216,7 +216,13 @@ impl Transport {
     }
 
     fn error_from(&self, status: u16, headers: &Headers, bytes: &[u8]) -> Api2ConvertError {
-        let body: Value = serde_json::from_slice(bytes).unwrap_or(Value::Null);
+        // Belt-and-suspenders: deep-redact the decoded error body before it lands on the
+        // exception. Cloud credentials ride in the plaintext request body; the API only ever
+        // echoes field *names* (never a value), but a future server/proxy change must not be
+        // able to surface a secret through `err.body()`. The `message` is server-provided text
+        // and is never derived from the request body.
+        let raw: Value = serde_json::from_slice(bytes).unwrap_or(Value::Null);
+        let body = crate::redact::redact_body(&raw);
         let message = body
             .get("message")
             .and_then(Value::as_str)

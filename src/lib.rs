@@ -65,6 +65,7 @@ mod convert_options;
 mod data;
 mod errors;
 mod models;
+mod redact;
 mod resources;
 mod result;
 mod transport;
@@ -72,9 +73,11 @@ mod upload;
 mod version;
 mod webhook;
 
+pub mod cloud;
 pub mod enums;
 
 pub use client::{Api2Convert, Input};
+pub use cloud::{CloudInput, OutputTarget};
 pub use config::{ClientBuilder, API_KEY_ENV, DEFAULT_BASE_URL};
 pub use convert_options::{AsyncOptions, ConvertOptions};
 pub use errors::{Api2ConvertError, ApiErrorData, Result};

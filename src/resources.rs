@@ -82,13 +82,17 @@ impl JobsResource {
         Ok(())
     }
 
-    /// Attach an input by descriptor, e.g. a remote URL:
-    /// `add_input(id, json!({"type": "remote", "source": "https://…"}))`.
-    pub fn add_input(&self, job_id: &str, descriptor: Value) -> Result<InputFile> {
+    /// Attach an input by descriptor. Pass a raw JSON map, e.g. a remote URL
+    /// `add_input(id, json!({"type": "remote", "source": "https://…"}))` or a
+    /// Google Drive picker
+    /// `add_input(id, json!({"type": "gdrive_picker", "source": "<file-id>", "credentials": {"token": "…"}}))`,
+    /// or a [`CloudInput`](crate::CloudInput) builder directly (it converts into
+    /// the `{type:"cloud", …}` descriptor).
+    pub fn add_input(&self, job_id: &str, descriptor: impl Into<Value>) -> Result<InputFile> {
         let path = format!("jobs/{}/input", encode_segment(job_id));
-        let v = self
-            .transport
-            .account_request("POST", &path, &[], Some(descriptor), None)?;
+        let v =
+            self.transport
+                .account_request("POST", &path, &[], Some(descriptor.into()), None)?;
         Ok(InputFile::from_value(&v))
     }
 

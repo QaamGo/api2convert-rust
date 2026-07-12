@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 use serde_json::{json, Map, Value};
 
+use crate::cloud::{CloudInput, OutputTarget};
 use crate::config::ClientBuilder;
 use crate::convert_options::{AsyncOptions, ConvertOptions};
 use crate::errors::Result;
@@ -86,6 +87,15 @@ fn is_url(s: &str) -> bool {
     lower.starts_with("http://") || lower.starts_with("https://")
 }
 
+/// The source of a conversion, internal to [`Api2Convert::start_conversion`]. A
+/// cloud input is deliberately **not** a public [`Input`] variant (that would be
+/// a breaking change to the write-only `Input` enum): cloud inputs enter through
+/// the dedicated `convert_cloud*` methods.
+enum Source {
+    Local(Input),
+    Cloud(CloudInput),
+}
+
 /// The API2Convert client. Cheap to clone (shares one transport).
 #[derive(Clone)]
 pub struct Api2Convert {
@@ -161,8 +171,31 @@ impl Api2Convert {
         to: &str,
         opts: ConvertOptions,
     ) -> Result<ConversionResult> {
+        self.run_sync(Source::Local(input.into()), to, opts)
+    }
+
+    /// One-call convert from cloud storage: import the source straight from
+    /// customer storage (a started job, like a remote URL) and deliver — or
+    /// download — the result. Pass an `output_targets` control on
+    /// [`ConvertOptions`] to deliver the output(s) to customer storage instead;
+    /// the returned [`ConversionResult`] then has no local output.
+    pub fn convert_cloud(&self, input: CloudInput, to: &str) -> Result<ConversionResult> {
+        self.convert_cloud_with(input, to, ConvertOptions::new())
+    }
+
+    /// [`convert_cloud`](Self::convert_cloud) with extra controls.
+    pub fn convert_cloud_with(
+        &self,
+        input: CloudInput,
+        to: &str,
+        opts: ConvertOptions,
+    ) -> Result<ConversionResult> {
+        self.run_sync(Source::Cloud(input), to, opts)
+    }
+
+    fn run_sync(&self, source: Source, to: &str, opts: ConvertOptions) -> Result<ConversionResult> {
         let job = self.start_conversion(
-            input.into(),
+            source,
             to,
             opts.conversion_options.clone(),
             opts.category.as_deref(),
@@ -170,6 +203,7 @@ impl Api2Convert {
             None,
             opts.filename.as_deref(),
             opts.download_password.as_deref(),
+            opts.output_targets.clone(),
         )?;
         let job = self.jobs().wait(&job.id, opts.timeout, true)?;
         Ok(ConversionResult::new(
@@ -192,8 +226,28 @@ impl Api2Convert {
         to: &str,
         opts: AsyncOptions,
     ) -> Result<Job> {
+        self.run_async(Source::Local(input.into()), to, opts)
+    }
+
+    /// Start a cloud conversion without polling (the async analogue of
+    /// [`convert_cloud`](Self::convert_cloud)).
+    pub fn convert_cloud_async(&self, input: CloudInput, to: &str) -> Result<Job> {
+        self.convert_cloud_async_with(input, to, AsyncOptions::new())
+    }
+
+    /// [`convert_cloud_async`](Self::convert_cloud_async) with extra controls.
+    pub fn convert_cloud_async_with(
+        &self,
+        input: CloudInput,
+        to: &str,
+        opts: AsyncOptions,
+    ) -> Result<Job> {
+        self.run_async(Source::Cloud(input), to, opts)
+    }
+
+    fn run_async(&self, source: Source, to: &str, opts: AsyncOptions) -> Result<Job> {
         self.start_conversion(
-            input.into(),
+            source,
             to,
             opts.conversion_options,
             opts.category.as_deref(),
@@ -201,6 +255,7 @@ impl Api2Convert {
             opts.callback.as_deref(),
             opts.filename.as_deref(),
             opts.download_password.as_deref(),
+            opts.output_targets,
         )
     }
 
@@ -221,7 +276,7 @@ impl Api2Convert {
     #[allow(clippy::too_many_arguments)]
     fn start_conversion(
         &self,
-        input: Input,
+        source: Source,
         to: &str,
         options: Map<String, Value>,
         category: Option<&str>,
@@ -229,6 +284,7 @@ impl Api2Convert {
         callback: Option<&str>,
         filename: Option<&str>,
         download_password: Option<&str>,
+        output_targets: Vec<OutputTarget>,
     ) -> Result<Job> {
         let mut conversion = Map::new();
         conversion.insert("target".to_string(), Value::String(to.to_string()));
@@ -237,6 +293,14 @@ impl Api2Convert {
         }
         if !options.is_empty() {
             conversion.insert("options".to_string(), Value::Object(options));
+        }
+        // Cloud delivery targets attach to the conversion's `output_target` — a named
+        // control, never merged into the options map.
+        if !output_targets.is_empty() {
+            conversion.insert(
+                "output_target".to_string(),
+                Value::Array(output_targets.iter().map(OutputTarget::to_value).collect()),
+            );
         }
 
         let mut payload = Map::new();
@@ -257,8 +321,15 @@ impl Api2Convert {
             );
         }
 
-        match input {
-            Input::Url(url) => {
+        match source {
+            // A cloud input imports from customer storage — a started job with the descriptor
+            // inline, exactly like a remote URL (never staged/uploaded).
+            Source::Cloud(cloud) => {
+                payload.insert("process".to_string(), Value::Bool(true));
+                payload.insert("input".to_string(), json!([cloud.to_value()]));
+                self.jobs().create(Value::Object(payload), None)
+            }
+            Source::Local(Input::Url(url)) => {
                 payload.insert("process".to_string(), Value::Bool(true));
                 payload.insert(
                     "input".to_string(),
@@ -266,7 +337,7 @@ impl Api2Convert {
                 );
                 self.jobs().create(Value::Object(payload), None)
             }
-            other => {
+            Source::Local(other) => {
                 payload.insert("process".to_string(), Value::Bool(false));
                 let job = self.jobs().create(Value::Object(payload), None)?;
                 self.jobs().upload(&job, other, filename)?;

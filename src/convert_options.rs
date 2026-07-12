@@ -9,6 +9,8 @@ use std::time::Duration;
 
 use serde_json::{Map, Value};
 
+use crate::cloud::OutputTarget;
+
 /// Controls for a synchronous [`convert`](crate::Api2Convert::convert_with).
 #[derive(Default, Clone)]
 pub struct ConvertOptions {
@@ -18,6 +20,7 @@ pub struct ConvertOptions {
     pub(crate) download_password: Option<String>,
     pub(crate) output_index: usize,
     pub(crate) timeout: Option<Duration>,
+    pub(crate) output_targets: Vec<OutputTarget>,
 }
 
 impl ConvertOptions {
@@ -69,6 +72,21 @@ impl ConvertOptions {
         self.timeout = Some(d);
         self
     }
+
+    /// Attach a cloud [`OutputTarget`] to the conversion's `output_target` — the
+    /// output is delivered straight to your storage instead of produced as a
+    /// local (downloadable) file. Call repeatedly to add several. Output targets
+    /// are a **named control**, never merged into the conversion-options map.
+    pub fn output_target(mut self, target: OutputTarget) -> Self {
+        self.output_targets.push(target);
+        self
+    }
+
+    /// Replace the whole list of cloud [`OutputTarget`]s for the conversion.
+    pub fn output_targets(mut self, targets: Vec<OutputTarget>) -> Self {
+        self.output_targets = targets;
+        self
+    }
 }
 
 /// Controls for an asynchronous
@@ -80,6 +98,7 @@ pub struct AsyncOptions {
     pub(crate) filename: Option<String>,
     pub(crate) download_password: Option<String>,
     pub(crate) callback: Option<String>,
+    pub(crate) output_targets: Vec<OutputTarget>,
 }
 
 impl AsyncOptions {
@@ -122,6 +141,21 @@ impl AsyncOptions {
     /// A webhook URL to notify on status change (sets `notify_status: true`).
     pub fn callback(mut self, url: impl Into<String>) -> Self {
         self.callback = Some(url.into());
+        self
+    }
+
+    /// Attach a cloud [`OutputTarget`] to the conversion's `output_target` — the
+    /// output is delivered straight to your storage instead of produced as a
+    /// local (downloadable) file. Call repeatedly to add several. Output targets
+    /// are a **named control**, never merged into the conversion-options map.
+    pub fn output_target(mut self, target: OutputTarget) -> Self {
+        self.output_targets.push(target);
+        self
+    }
+
+    /// Replace the whole list of cloud [`OutputTarget`]s for the conversion.
+    pub fn output_targets(mut self, targets: Vec<OutputTarget>) -> Self {
+        self.output_targets = targets;
         self
     }
 }

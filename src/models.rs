@@ -11,6 +11,7 @@
 
 use serde_json::{Map, Value};
 
+use crate::cloud::OutputTarget;
 use crate::data;
 use crate::enums::job_status;
 
@@ -39,6 +40,10 @@ pub struct Conversion {
     pub category: Option<String>,
     pub options: Map<String, Value>,
     pub metadata: Map<String, Value>,
+    /// Cloud delivery targets for this conversion's output, if any. Empty for a
+    /// conversion with a local (downloadable) output. `credentials` are never
+    /// surfaced; `type`/`parameters`/`status` round-trip raw.
+    pub output_target: Vec<OutputTarget>,
 }
 
 impl Conversion {
@@ -49,6 +54,7 @@ impl Conversion {
             category: data::opt_string(v.get("category")),
             options: data::object(v.get("options")),
             metadata: data::object(v.get("metadata")),
+            output_target: data::map_objects(v.get("output_target"), OutputTarget::from_value),
         }
     }
 }
@@ -65,6 +71,9 @@ pub struct InputFile {
     pub size: Option<i64>,
     pub content_type: Option<String>,
     pub options: Map<String, Value>,
+    /// Cloud-input locator keys (`bucket`, `file`, `host`, …) surfaced on read;
+    /// empty for a non-cloud input.
+    pub parameters: Map<String, Value>,
 }
 
 impl InputFile {
@@ -78,6 +87,7 @@ impl InputFile {
             size: data::opt_i64(v.get("size")),
             content_type: data::opt_string(v.get("content_type")),
             options: data::object(v.get("options")),
+            parameters: data::object(v.get("parameters")),
         }
     }
 }
