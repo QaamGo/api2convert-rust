@@ -27,8 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Newest stable and the crate's MSRV.
-        toolchain: [stable, "1.86"]
+        # Floating newest stable, the current latest release pinned so its
+        # coverage survives a future stable bump, and the crate's MSRV.
+        toolchain: [stable, "1.97", "1.86"]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
