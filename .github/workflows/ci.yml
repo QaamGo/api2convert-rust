@@ -39,6 +39,23 @@ jobs:
       - name: Test (unit + offline + security)
         run: cargo test --all-features
 
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      # rust-cache also caches ~/.cargo/bin, so cargo-audit is only compiled once.
+      - uses: Swatinem/rust-cache@v2
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+      # No Cargo.lock is committed (this is a library), so resolve the tree first and audit
+      # what a consumer would actually get — reqwest pulls the bulk of it.
+      - name: cargo audit
+        run: |
+          cargo generate-lockfile
+          cargo audit
+
   live:
     # Live conformance hits the real API and consumes quota. It runs only on the
     # default branch / manual dispatch, and only when the key secret is present.

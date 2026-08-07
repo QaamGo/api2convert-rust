@@ -1,0 +1,24 @@
+version: 2
+updates:
+  # Cargo dependencies. No Cargo.lock is committed (this is a library), so Dependabot
+  # updates the constraints in Cargo.toml. reqwest pulls the largest transitive tree
+  # here, so it is the one worth keeping current.
+  - package-ecosystem: cargo
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      # RustCrypto releases hmac/sha2 in lockstep; one PR per train.
+      rustcrypto:
+        patterns:
+          - "hmac"
+          - "sha2"
+
+  # GitHub Actions used by CI and the release pipeline. Keeps the pinned action
+  # versions current (and, once SHA-pinned, updates the SHA + version comment).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
