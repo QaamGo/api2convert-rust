@@ -1,7 +1,7 @@
 //! Webhook signature verification and parsing.
 
 use api2convert::{Api2Convert, Api2ConvertError};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use sha2::Sha256;
 
 fn sign(secret: &str, payload: &[u8]) -> String {

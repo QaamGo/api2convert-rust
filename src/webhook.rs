@@ -2,7 +2,9 @@
 //! verifier via [`Api2Convert::webhooks`](crate::Api2Convert::webhooks) — it
 //! needs no configured client.
 
-use hmac::{Hmac, Mac};
+// hmac 0.13 moved `new_from_slice` off the `Mac` trait onto `KeyInit`; both must be
+// in scope. `update`/`verify_slice` remain on `Mac`.
+use hmac::{Hmac, KeyInit, Mac};
 use serde_json::Value;
 use sha2::Sha256;
 

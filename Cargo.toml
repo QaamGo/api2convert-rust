@@ -15,17 +15,20 @@ categories = ["api-bindings", "web-programming::http-client", "multimedia"]
 exclude = ["/.github", "/tests", "/docs", "/openapi", "/Makefile"]
 
 [dependencies]
-reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
+# reqwest 0.13 renamed the `rustls-tls` feature to `rustls` and no longer pulls the
+# Mozilla root store implicitly, so `webpki-roots` is now explicit. Same trust anchors
+# as before — do not swap it for rustls-native-certs without deciding that deliberately.
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls", "webpki-roots"] }
 serde_json = "1"
-hmac = "0.12"
-sha2 = "0.10"
+hmac = "0.13"
+sha2 = "0.11"
 
 [dev-dependencies]
 # The security suite spins up minimal loopback HTTP servers hand-rolled over
 # std::net::TcpListener. hmac/sha2 (already runtime deps) let the webhook test
 # compute a signature to verify against.
-hmac = "0.12"
-sha2 = "0.10"
+hmac = "0.13"
+sha2 = "0.11"
 
 # One runnable example per documented guide (docs.api2convert.com).
 [[example]]
