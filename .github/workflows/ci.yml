@@ -65,7 +65,7 @@ jobs:
     # Live conformance hits the real API and consumes quota. It runs only on the
     # default branch / manual dispatch, and only when the key secret is present.
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v7
