@@ -34,7 +34,7 @@ jobs:
       matrix:
         # Floating newest stable, the current latest release pinned so its
         # coverage survives a future stable bump, and the crate's MSRV.
-        toolchain: [stable, "1.97", "1.86"]
+        toolchain: [stable, "1.97", "1.88"]
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@master
