@@ -129,7 +129,7 @@ println!("job {} is {}", event.job.id, event.job.status.code);
 
 ## Cloud storage
 
-Read an input straight from your own cloud storage (S3, Azure, FTP, Google Cloud) and/or deliver the
+Read an input straight from your own cloud storage (S3, Azure, Google Cloud) and/or deliver the
 result back into a bucket. Each per-provider input constructor carries that provider's keys verbatim
 — flat and lowercase, exactly as the API expects.
 

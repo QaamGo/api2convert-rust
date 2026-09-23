@@ -29,13 +29,13 @@ Two layers make up an SDK:
 - **Add remote input**: `POST /jobs/{id}/input` `{ type:'remote', source:'https://…' }`.
 - **Cloud input** (import from customer storage): `POST /jobs/{id}/input` (or inline in `create`)
   `{ type:'cloud', source:<provider>, parameters:{…}, credentials:{…} }`, `<provider> ∈ {amazons3,
-  azure, ftp, googlecloud}`; plus `{ type:'gdrive_picker', source:<drive-file-id>,
+  azure, googlecloud}`; plus `{ type:'gdrive_picker', source:<drive-file-id>,
   credentials:{token}, content_type? }` for Google Drive. The API validates a cloud descriptor
   **asynchronously** — it accepts any descriptor on create (`201`) and later fails a bad one on the
   input (`status:failed`, generic `code 99`); it never echoes a credential value.
 - **Cloud output** (deliver to customer storage): a `conversion[]` may carry
   `output_target:[{ type:<provider>, parameters:{…}, credentials:{…} }]`, `<provider> ∈ {amazons3,
-  googlecloud, azure, ftp, youtube, gdrive}`. `status` (`waiting|uploading|completed|failed`) is
+  googlecloud, azure, youtube, gdrive}`. `status` (`waiting|uploading|completed|failed`) is
   server-set and read-only — never sent on create. The job reaches `completed` only after the upload
   succeeds (a failed upload → `failed`); an output-target conversion produces **no** local output.
 - **Start**: `PATCH /jobs/{id}` `{ process:true }`.
@@ -102,14 +102,14 @@ wire descriptors above; per-provider keys are **not** validated synchronously se
 typed surface is the client's only pre-flight structure.
 
 - **Provider vocabulary** — one shared `CloudProvider` concept (per-language spelling): `amazons3,
-  azure, ftp, gdrive, googlecloud, youtube`. It is **build-side vocabulary only** — read models keep
+  azure, gdrive, googlecloud, youtube`. It is **build-side vocabulary only** — read models keep
   `source`/`type`/`status` as raw strings, and an unknown provider from the server round-trips
   untyped (never throws).
 - **Cloud input** — a `CloudInput` builder emits `{ type:cloud, source, parameters, credentials }`
   and hands off to `addInput` / the create path. It ships per-provider named constructors whose
   signatures carry each provider's required keys **verbatim** (flat/lowercase, as the API expects):
   `amazonS3(bucket, file, accesskeyid, secretaccesskey)`,
-  `azure(container, file, accountname, accountkey)`, `ftp(host, file, username, password)`,
+  `azure(container, file, accountname, accountkey)`,
   `googleCloud(projectid, bucket, file, keyfile)`. The required keys are **constructor arguments**,
   not a runtime gate — the builder never rejects a descriptor the permissive server would accept, and
   a generic `parameters`/`credentials` map stays reachable for optional/forward-compat keys. Google

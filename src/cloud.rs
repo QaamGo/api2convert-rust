@@ -37,21 +37,20 @@ use crate::redact;
 /// hard `enum`): read models keep `source`/`type`/`status` as raw strings, so an
 /// unknown provider string round-trips untyped and never rejects.
 ///
-/// Import support (a [`CloudInput`] constructor) exists for [`AMAZONS3`], [`AZURE`],
-/// [`FTP`] and [`GOOGLECLOUD`]. [`GDRIVE`] and [`YOUTUBE`] are **output-only** (they
+/// Import support (a [`CloudInput`] constructor) exists for [`AMAZONS3`], [`AZURE`]
+/// and [`GOOGLECLOUD`]. [`GDRIVE`] and [`YOUTUBE`] are **output-only** (they
 /// validate as an output `type` but have no downloader); Google Drive *input*
 /// uses the separate `gdrive_picker` input type via the raw
 /// [`add_input`](crate::JobsResource::add_input) path.
 pub mod provider {
     pub const AMAZONS3: &str = "amazons3";
     pub const AZURE: &str = "azure";
-    pub const FTP: &str = "ftp";
     pub const GDRIVE: &str = "gdrive";
     pub const GOOGLECLOUD: &str = "googlecloud";
     pub const YOUTUBE: &str = "youtube";
 
     /// The full provider vocabulary, in canonical order.
-    pub const ALL: [&str; 6] = [AMAZONS3, AZURE, FTP, GDRIVE, GOOGLECLOUD, YOUTUBE];
+    pub const ALL: [&str; 5] = [AMAZONS3, AZURE, GDRIVE, GOOGLECLOUD, YOUTUBE];
 }
 
 /// A cloud-storage input descriptor: `{ type:"cloud", source, parameters, credentials }`.
@@ -125,20 +124,6 @@ impl CloudInput {
                 ("accountname", accountname.into()),
                 ("accountkey", accountkey.into()),
             ]),
-        }
-    }
-
-    /// Import from an FTP server.
-    pub fn ftp(
-        host: impl Into<String>,
-        file: impl Into<String>,
-        username: impl Into<String>,
-        password: impl Into<String>,
-    ) -> Self {
-        CloudInput {
-            source: provider::FTP.to_string(),
-            parameters: obj([("host", host.into()), ("file", file.into())]),
-            credentials: obj([("username", username.into()), ("password", password.into())]),
         }
     }
 
@@ -230,7 +215,7 @@ impl From<&CloudInput> for Value {
 /// returns them empty).
 #[derive(Clone)]
 pub struct OutputTarget {
-    /// The provider, e.g. [`provider::FTP`] — a raw string (an unknown provider
+    /// The provider, e.g. [`provider::AZURE`] — a raw string (an unknown provider
     /// round-trips untyped).
     pub kind: String,
     /// Delivery locator keys (provider-specific).
@@ -336,7 +321,6 @@ mod tests {
             [
                 "amazons3",
                 "azure",
-                "ftp",
                 "gdrive",
                 "googlecloud",
                 "youtube"
@@ -397,18 +381,30 @@ mod tests {
     }
 
     #[test]
-    fn output_target_omits_status_on_serialize_but_hydrates_it_on_read() {
-        let created = OutputTarget::of("ftp")
-            .parameter("host", "h")
-            .credential("username", "u");
-        let v = created.to_value();
-        assert!(v.get("status").is_none());
-        assert_eq!(v["type"], "ftp");
-
+    fn retired_ftp_provider_still_hydrates_from_historical_jobs() {
+        // `ftp` is no longer build-side vocabulary, but the API still returns it on jobs created
+        // before it was retired. Reads stay raw strings so those jobs never fail to hydrate.
         let read = OutputTarget::from_value(&json!({
-            "type": "ftp", "parameters": {"host": "h"}, "credentials": {"x": "y"}, "status": "completed"
+            "type": "ftp", "parameters": {"host": "h"}, "status": "completed"
         }));
         assert_eq!(read.kind, "ftp");
+        assert_eq!(read.status.as_deref(), Some("completed"));
+        assert!(!provider::ALL.contains(&"ftp"));
+    }
+
+    #[test]
+    fn output_target_omits_status_on_serialize_but_hydrates_it_on_read() {
+        let created = OutputTarget::of("azure")
+            .parameter("container", "c")
+            .credential("accountkey", "k");
+        let v = created.to_value();
+        assert!(v.get("status").is_none());
+        assert_eq!(v["type"], "azure");
+
+        let read = OutputTarget::from_value(&json!({
+            "type": "azure", "parameters": {"container": "c"}, "credentials": {"x": "y"}, "status": "completed"
+        }));
+        assert_eq!(read.kind, "azure");
         assert_eq!(read.status.as_deref(), Some("completed"));
         // credentials are never surfaced on read.
         assert!(read.credentials.is_empty());

@@ -32,9 +32,9 @@ fn expected_input() -> Value {
 /// The exact output_target descriptor fixture 1 expects — note: no `status` key.
 fn expected_output_target() -> Value {
     json!({
-        "type": "ftp",
-        "parameters": {"host": "ftp.example.com", "file": "/out/photo.jpg"},
-        "credentials": {"username": "u", "password": "p"}
+        "type": "azure",
+        "parameters": {"container": "out-container", "file": "/out/photo.jpg"},
+        "credentials": {"accountname": "n", "accountkey": "k"}
     })
 }
 
@@ -52,11 +52,11 @@ fn fixture1_convert_serializes_cloud_input_and_output_target() {
     let client = client(sender.clone());
 
     let input = CloudInput::amazon_s3("my-bucket", "in/photo.png", "AKIA_TEST", "SECRET_TEST");
-    let target = OutputTarget::of(provider::FTP)
-        .parameter("host", "ftp.example.com")
+    let target = OutputTarget::of(provider::AZURE)
+        .parameter("container", "out-container")
         .parameter("file", "/out/photo.jpg")
-        .credential("username", "u")
-        .credential("password", "p");
+        .credential("accountname", "n")
+        .credential("accountkey", "k");
 
     let result = client
         .convert_cloud_with(input, "jpg", ConvertOptions::new().output_target(target))
@@ -101,9 +101,9 @@ fn fixture1_raw_create_path_produces_byte_identical_output_target() {
                 "conversion": [{
                     "target": "jpg",
                     "output_target": [OutputTarget::new(
-                        provider::FTP,
-                        json!({"host": "ftp.example.com", "file": "/out/photo.jpg"}).as_object().unwrap().clone(),
-                        json!({"username": "u", "password": "p"}).as_object().unwrap().clone(),
+                        provider::AZURE,
+                        json!({"container": "out-container", "file": "/out/photo.jpg"}).as_object().unwrap().clone(),
+                        json!({"accountname": "n", "accountkey": "k"}).as_object().unwrap().clone(),
                     ).to_value()],
                 }]
             }),
@@ -124,27 +124,27 @@ fn fixture1_raw_create_path_produces_byte_identical_output_target() {
 #[test]
 fn add_input_accepts_cloud_input_builder() {
     let sender = FakeSender::new();
-    sender.push_ok(json!({"id": "in-1", "type": "cloud", "source": "ftp"}));
+    sender.push_ok(json!({"id": "in-1", "type": "cloud", "source": "azure"}));
     let client = client(sender.clone());
 
     client
         .jobs()
         .add_input(
             "job-1",
-            CloudInput::ftp("ftp.example.com", "in/a.png", "u", "p"),
+            CloudInput::azure("in-container", "in/a.png", "n", "k"),
         )
         .expect("add_input");
 
     let body = sender.request_at(0).body_json();
     assert_eq!(body["type"], "cloud");
-    assert_eq!(body["source"], "ftp");
+    assert_eq!(body["source"], "azure");
     assert_eq!(
         body["parameters"],
-        json!({"host": "ftp.example.com", "file": "in/a.png"})
+        json!({"container": "in-container", "file": "in/a.png"})
     );
     assert_eq!(
         body["credentials"],
-        json!({"username": "u", "password": "p"})
+        json!({"accountname": "n", "accountkey": "k"})
     );
 }
 
@@ -168,8 +168,8 @@ fn fixture2_hydrates_cloud_input_and_output_target() {
             "id": "c-1",
             "target": "jpg",
             "output_target": [{
-                "type": "ftp",
-                "parameters": {"host": "ftp.example.com", "file": "/out/photo.jpg"},
+                "type": "azure",
+                "parameters": {"container": "out-container", "file": "/out/photo.jpg"},
                 "credentials": {},
                 "status": "uploading"
             }]
@@ -188,11 +188,11 @@ fn fixture2_hydrates_cloud_input_and_output_target() {
 
     // 2) output target status/parameters/type surface.
     let out = &job.conversion[0].output_target[0];
-    assert_eq!(out.kind, "ftp");
+    assert_eq!(out.kind, "azure");
     assert_eq!(out.status.as_deref(), Some("uploading"));
     assert_eq!(
         Value::Object(out.parameters.clone()),
-        json!({"host": "ftp.example.com", "file": "/out/photo.jpg"})
+        json!({"container": "out-container", "file": "/out/photo.jpg"})
     );
 
     // 3) credentials are never surfaced (the API returns them empty; the SDK does not hydrate).
@@ -238,10 +238,10 @@ fn fixture3a_cloud_input_debug_masks_credentials() {
 fn fixture3a_output_target_debug_masks_credentials() {
     let rendered = format!(
         "{:?}",
-        OutputTarget::of(provider::FTP)
-            .parameter("host", "ftp.example.com")
-            .credential("username", "u")
-            .credential("password", SECRET)
+        OutputTarget::of(provider::AZURE)
+            .parameter("container", "out-container")
+            .credential("accountname", "n")
+            .credential("accountkey", SECRET)
     );
     assert!(!rendered.contains(SECRET));
     assert!(rendered.contains(MARKER));
@@ -295,13 +295,19 @@ fn fixture3d_sensitive_parameters_leaf_is_masked_in_rendering() {
 // ---- Unit: the provider vocabulary --------------------------------------------------------
 
 #[test]
+fn retired_ftp_provider_is_not_in_the_vocabulary() {
+    // `ftp` is retired: the API still returns it on historical jobs (reads stay raw strings),
+    // but it is no longer build-side vocabulary.
+    assert!(!provider::ALL.contains(&"ftp"));
+}
+
+#[test]
 fn provider_vocabulary() {
     assert_eq!(
         provider::ALL,
         [
             "amazons3",
             "azure",
-            "ftp",
             "gdrive",
             "googlecloud",
             "youtube"
@@ -312,10 +318,10 @@ fn provider_vocabulary() {
 /// Type-checks that the async cloud entry points compile with output targets.
 #[allow(dead_code)]
 fn _api_surface_compiles(client: &Api2Convert) {
-    let _ = client.convert_cloud(CloudInput::ftp("h", "f", "u", "p"), "jpg");
-    let _ = client.convert_cloud_async(CloudInput::ftp("h", "f", "u", "p"), "jpg");
+    let _ = client.convert_cloud(CloudInput::azure("c", "f", "n", "k"), "jpg");
+    let _ = client.convert_cloud_async(CloudInput::azure("c", "f", "n", "k"), "jpg");
     let _ = client.convert_cloud_async_with(
-        CloudInput::ftp("h", "f", "u", "p"),
+        CloudInput::azure("c", "f", "n", "k"),
         "jpg",
         api2convert::AsyncOptions::new().output_target(OutputTarget::of("gdrive")),
     );
