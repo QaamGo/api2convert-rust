@@ -318,13 +318,7 @@ mod tests {
     fn provider_vocabulary_in_order() {
         assert_eq!(
             provider::ALL,
-            [
-                "amazons3",
-                "azure",
-                "gdrive",
-                "googlecloud",
-                "youtube"
-            ]
+            ["amazons3", "azure", "gdrive", "googlecloud", "youtube"]
         );
     }
 

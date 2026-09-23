@@ -305,13 +305,7 @@ fn retired_ftp_provider_is_not_in_the_vocabulary() {
 fn provider_vocabulary() {
     assert_eq!(
         provider::ALL,
-        [
-            "amazons3",
-            "azure",
-            "gdrive",
-            "googlecloud",
-            "youtube"
-        ]
+        ["amazons3", "azure", "gdrive", "googlecloud", "youtube"]
     );
 }
 
