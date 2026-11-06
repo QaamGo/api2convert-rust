@@ -4,6 +4,10 @@ on:
   push:
     branches: [master, main]
   pull_request:
+  # Weekly, so a new advisory turns the audit red without a push. GitHub switches scheduled runs off
+  # after 60 days without a commit in a public repository.
+  schedule:
+    - cron: '43 5 * * 1'
   workflow_dispatch:
 
 # Least privilege by default; no job here writes to the repo. Matches release.yml
@@ -65,7 +69,7 @@ jobs:
     # Live conformance hits the real API and consumes quota. It runs only on the
     # default branch / manual dispatch, and only when the key secret is present.
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    if: github.event_name != 'schedule' && (github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main')
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v7
