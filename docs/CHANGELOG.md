@@ -4,6 +4,14 @@ All notable changes to the API2Convert Rust SDK are documented here. This SDK ve
 the sibling SDKs (PHP, Python, Java, Node.js, Go, Ruby) against the shared
 [`SDK_CONTRACT.md`](SDK_CONTRACT.md).
 
+## 10.3.2 — 2026-11-06
+
+- Removed the FTP cloud provider, because FTP is being retired from the API: `CloudInput::ftp()` and
+  `provider::FTP`. Code that uses them no longer compiles and needs another provider.
+  Reading stays tolerant: jobs created with `ftp` earlier still load.
+- Updated `reqwest` to 0.13, `hmac` to 0.13 and `sha2` to 0.11, and raised the minimum Rust version
+  to 1.88.
+
 ## 10.2.1 — 2026-07-08
 
 Lock-step version bump to keep all API2Convert SDKs on 10.2.1. No library/runtime changes since
